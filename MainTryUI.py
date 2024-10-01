@@ -165,6 +165,9 @@ class Ui_MainTry(object):
         self.reclineEdit = QtWidgets.QLineEdit(Dialog)
         self.reclineEdit.setObjectName("reclineEdit")
         self.verticalLayout.addWidget(self.reclineEdit)
+        self.reclineEditImg = QtWidgets.QLineEdit(Dialog)
+        self.reclineEditImg.setObjectName("reclineEditImg")
+        self.verticalLayout.addWidget(self.reclineEditImg)
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -175,6 +178,7 @@ class Ui_MainTry(object):
         self.name_label.setText(_translate("Dialog", "Your Name"))
         self.online.setText(_translate("Dialog", "Online"))
         self.sendtext_lineEdit.setPlaceholderText(_translate("Dialog", "Напишите сообщение..."))
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

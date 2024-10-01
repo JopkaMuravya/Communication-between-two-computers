@@ -1,4 +1,5 @@
 from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QListWidgetItem, QWidget
 from PyQt5.QtCore import QThread, pyqtSignal
 import sys
@@ -13,6 +14,9 @@ import os
 from _thread import *
 clientaa = None
 stop_thread = False
+NumberImage = 0
+
+
 class UAnswer(QWidget, Ui_Your_Answer):
     def __init__(self, parent=None):
         super(UAnswer, self).__init__(parent)
@@ -33,6 +37,9 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
         self.end_pushButton.clicked.connect(self.closed)
         self.reclineEdit.setHidden(True)
         self.reclineEdit.textChanged.connect(self.recMassage)
+        self.image_pushButton.clicked.connect(self.sendi)
+        self.reclineEditImg.setHidden(True)
+        self.reclineEditImg.textChanged.connect(self.recImage)
 
 
     def closed(self):
@@ -45,8 +52,30 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
         u_answer = UAnswer()
         u_answer.your_text_label.setText(str(self.sendtext_lineEdit.text()))
         if clientaa != None:
+            clientaa.send("massage".encode('utf-8'))
             massage = self.sendtext_lineEdit.text().encode('utf-8')
             clientaa.send(massage)
+        item = QListWidgetItem()
+        item.setSizeHint(u_answer.sizeHint())
+        self.chatlistWidget.addItem(item)
+        self.chatlistWidget.setItemWidget(item, u_answer)
+        self.chatlistWidget.setMinimumWidth(u_answer.width())
+        self.sendtext_lineEdit.setText("")
+        self.chatlistWidget.setCurrentRow(self.chatlistWidget.count() - 1)
+
+    def sendi(self):
+        u_answer = UAnswer()
+        path = QtWidgets.QFileDialog.getOpenFileName()[0]
+        pixmap = QPixmap(path)
+        u_answer.your_text_label.setPixmap(pixmap)
+        size_img = os.path.getsize(path)
+        if clientaa != None:
+            clientaa.send("image".encode('utf-8'))
+            clientaa.send(f"{size_img}".encode('utf-8'))
+            file = open(path, 'rb')
+            image_data = file.read(size_img)
+            clientaa.send(image_data)
+            file.close()
         item = QListWidgetItem()
         item.setSizeHint(u_answer.sizeHint())
         self.chatlistWidget.addItem(item)
@@ -65,12 +94,24 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
         self.chatlistWidget.setMinimumWidth(answer.width())
         self.chatlistWidget.setCurrentRow(self.chatlistWidget.count()-1)
 
+    def recImage(self):
+        answer = Answer()
+        pixmap = QPixmap(f'Image{NumberImage}.jpg')
+        answer.yourfriend_text_label.setPixmap(pixmap)
+        item = QListWidgetItem()
+        item.setSizeHint(answer.sizeHint())
+        self.chatlistWidget.addItem(item)
+        self.chatlistWidget.setItemWidget(item, answer)
+        self.chatlistWidget.setMinimumWidth(answer.width())
+        self.chatlistWidget.setCurrentRow(self.chatlistWidget.count() - 1)
+
 class clientThread(Thread):
     def __init__(self, widow):
         Thread.__init__(self)
         self.window = widow
 
     def run(self):
+        global NumberImage
         global clientaa, stop_thread
         while not stop_thread:
             if stop_thread == True: break
@@ -79,11 +120,25 @@ class clientThread(Thread):
             print('Waiting for connection response')
 
             try:
-                clientaa.connect(("172.20.10.2", 12345))
+                clientaa.connect(("10.193.160.160", 12345))
                 while True:
                     massage = clientaa.recv(1024)
                     clearM = massage.decode("utf-8")
-                    self.window.reclineEdit.setText(str(clearM))
+                    print(clearM)
+                    if clearM == "massage":
+                        massage = clientaa.recv(1024)
+                        clearM = massage.decode("utf-8")
+                        self.window.reclineEdit.setText(str(clearM))
+                    elif clearM == "image":
+                        NumberImage += 1
+                        massage = clientaa.recv(1024)
+                        clearM = massage.decode("utf-8")
+                        size_img = int(clearM)
+                        file = open(f'Image{NumberImage}.jpg', "wb")
+                        image_chunk = clientaa.recv(size_img)
+                        file.write(image_chunk)
+                        file.close()
+                        self.window.reclineEditImg.setText(str(NumberImage))
             except socket.error as e:
                 print(str(e))
 
