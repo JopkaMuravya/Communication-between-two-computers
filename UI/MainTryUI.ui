@@ -85,7 +85,7 @@ QLabel{color:rgba(255,255,255,255);}
             <string/>
            </property>
            <property name="pixmap">
-            <pixmap resource="resic.qrc">:/images/user1.png</pixmap>
+            <pixmap>:/images/user1.png</pixmap>
            </property>
           </widget>
          </item>
@@ -157,7 +157,7 @@ QLabel{color:rgba(255,255,255,255);}
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="resic.qrc">
+            <iconset>
              <normaloff>:/images/close.png</normaloff>:/images/close.png</iconset>
            </property>
            <property name="iconSize">
@@ -251,7 +251,7 @@ QPushButton:pressed{background-color:rgba(176,196,222,250);}
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="resic.qrc">
+              <iconset>
                <normaloff>:/images/bukle.png</normaloff>:/images/bukle.png</iconset>
              </property>
              <property name="iconSize">
@@ -290,7 +290,7 @@ QPushButton:pressed{background-color:rgba(176,196,222,250);}
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="resic.qrc">
+              <iconset>
                <normaloff>:/images/arrow.png</normaloff>:/images/arrow.png</iconset>
              </property>
              <property name="iconSize">
@@ -311,6 +311,9 @@ QPushButton:pressed{background-color:rgba(176,196,222,250);}
    </item>
    <item>
     <widget class="QLineEdit" name="reclineEdit"/>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="reclineEditImg"/>
    </item>
   </layout>
  </widget>
