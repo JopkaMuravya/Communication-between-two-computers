@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QListWidgetItem, QWidget
+from PyQt5.QtWidgets import QListWidgetItem, QWidget, QLabel
 from PyQt5.QtCore import QThread, pyqtSignal
 import sys
 import datetime
@@ -71,7 +71,9 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
         size_img = os.path.getsize(path)
         if clientaa != None:
             clientaa.send("image".encode('utf-8'))
+            time.sleep(0.5)
             clientaa.send(f"{size_img}".encode('utf-8'))
+            time.sleep(0.5)
             file = open(path, 'rb')
             image_data = file.read(size_img)
             clientaa.send(image_data)
@@ -98,12 +100,20 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
         answer = Answer()
         pixmap = QPixmap(f'Image{NumberImage}.jpg')
         answer.yourfriend_text_label.setPixmap(pixmap)
+        self.test = QLabel()
+        self.test.setPixmap(pixmap)
+        self.test.resize(pixmap.width(), pixmap.height())
+        self.test.move(625, 625)
+        self.test.show()
+        if os.path.isfile(f'Image{NumberImage}.jpg'):
+            print(12334)
         item = QListWidgetItem()
         item.setSizeHint(answer.sizeHint())
         self.chatlistWidget.addItem(item)
         self.chatlistWidget.setItemWidget(item, answer)
         self.chatlistWidget.setMinimumWidth(answer.width())
         self.chatlistWidget.setCurrentRow(self.chatlistWidget.count() - 1)
+        print(NumberImage)
 
 class clientThread(Thread):
     def __init__(self, widow):
@@ -120,11 +130,10 @@ class clientThread(Thread):
             print('Waiting for connection response')
 
             try:
-                clientaa.connect(("10.193.160.160", 12345))
+                clientaa.connect(("192.168.0.109", 12345))
                 while True:
                     massage = clientaa.recv(1024)
                     clearM = massage.decode("utf-8")
-                    print(clearM)
                     if clearM == "massage":
                         massage = clientaa.recv(1024)
                         clearM = massage.decode("utf-8")

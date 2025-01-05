@@ -69,7 +69,10 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
         size_img = os.path.getsize(path)
         if server != None:
             server.send("image".encode('utf-8'))
+            time.sleep(0.5)
             server.send(f"{size_img}".encode('utf-8'))
+            time.sleep(0.5)
+            server.send(''.encode('utf-8'))
             file = open(path, 'rb')
             image_data = file.read(size_img)
             server.send(image_data)
@@ -116,9 +119,9 @@ class serverThread(Thread):
         while not stop_thread:
             if stop_thread == True: break
             clientaa = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            host = "10.193.160.160"
+            host = "10.193.166.148"
             port = 12345
-            clientaa.bind(("10.193.160.160", 12345))
+            clientaa.bind(("192.168.0.109", 12345))
             print(' Socket is listening...')
             clientaa.listen(1)
             global server
