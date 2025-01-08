@@ -5,7 +5,7 @@ import resic
 class Ui_Your_Answer(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(387, 117)
+        Form.resize(376, 117)
         self.verticalLayout = QtWidgets.QVBoxLayout(Form)
         self.verticalLayout.setObjectName("verticalLayout")
         self.groupBox = QtWidgets.QGroupBox(Form)
@@ -73,4 +73,12 @@ class Ui_Your_Answer(object):
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
-        self.your_text_label.setText(_translate("Form", "Hello chick!"))
+
+
+if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
+    Form = QtWidgets.QWidget()
+    ui = Ui_Your_Answer()
+    ui.setupUi(Form)
+    Form.show()
+    sys.exit(app.exec_())

@@ -22,12 +22,14 @@ class UAnswer(QWidget, Ui_Your_Answer):
         super(UAnswer, self).__init__(parent)
         QWidget.__init__(self)
         self.setupUi(self)
+        self.setMinimumWidth(680)
 
 class Answer(QWidget, Ui_Answer):
     def __init__(self, parent=None):
         super(Answer, self).__init__(parent)
         QWidget.__init__(self)
         self.setupUi(self)
+        self.setMinimumWidth(680)
 
 class Chat(QtWidgets.QDialog, Ui_MainTry):
     def __init__(self):
@@ -65,7 +67,10 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
         u_answer = UAnswer()
         path = QtWidgets.QFileDialog.getOpenFileName()[0]
         pixmap = QPixmap(path)
-        u_answer.your_text_label.setPixmap(pixmap)
+
+        small_pixmap = pixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
+        u_answer.your_text_label.setPixmap(small_pixmap)
+
         size_img = os.path.getsize(path)
         if server != None:
             server.send("image".encode('utf-8'))
@@ -77,14 +82,16 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
             image_data = file.read(size_img)
             server.send(image_data)
             file.close()
+
         item = QListWidgetItem()
         item.setSizeHint(u_answer.sizeHint())
         self.chatlistWidget.addItem(item)
         self.chatlistWidget.setItemWidget(item, u_answer)
         self.chatlistWidget.setMinimumWidth(u_answer.width())
+        u_answer.groupBox_3.setMaximumWidth(220)
         self.sendtext_lineEdit.setText("")
         self.chatlistWidget.setCurrentRow(self.chatlistWidget.count() - 1)
-        self.chatlistWidget.resize(pixmap.width(), pixmap.height())
+
 
     def recMassage(self, text):
         answer = Answer()
@@ -99,12 +106,16 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
     def recImage(self):
         answer = Answer()
         pixmap = QPixmap(f'Image{NumberImage}.jpg')
-        answer.yourfriend_text_label.setPixmap(pixmap)
+
+        small_pixmap = pixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
+        answer.yourfriend_text_label.setPixmap(small_pixmap)
+
         item = QListWidgetItem()
         item.setSizeHint(answer.sizeHint())
         self.chatlistWidget.addItem(item)
         self.chatlistWidget.setItemWidget(item, answer)
         self.chatlistWidget.setMinimumWidth(answer.width())
+        answer.groupBox_2.setMaximumWidth(220)
         self.chatlistWidget.setCurrentRow(self.chatlistWidget.count() - 1)
 
 
@@ -119,9 +130,9 @@ class serverThread(Thread):
         while not stop_thread:
             if stop_thread == True: break
             clientaa = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            host = "10.193.166.148"
+            host = "172.20.10.5"
             port = 12345
-            clientaa.bind(("192.168.0.109", 12345))
+            clientaa.bind(("172.20.10.5", 12345))
             print(' Socket is listening...')
             clientaa.listen(1)
             global server

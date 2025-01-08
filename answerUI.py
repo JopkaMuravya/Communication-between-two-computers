@@ -29,6 +29,7 @@ class Ui_Answer(object):
         self.chat_avatar_yourfriend_label.setObjectName("chat_avatar_yourfriend_label")
         self.verticalLayout_4.addWidget(self.chat_avatar_yourfriend_label)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+
         self.verticalLayout_4.addItem(spacerItem)
         self.horizontalLayout.addLayout(self.verticalLayout_4)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
@@ -73,3 +74,12 @@ class Ui_Answer(object):
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
+
+
+if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
+    Form = QtWidgets.QWidget()
+    ui = Ui_Answer()
+    ui.setupUi(Form)
+    Form.show()
+    sys.exit(app.exec_())

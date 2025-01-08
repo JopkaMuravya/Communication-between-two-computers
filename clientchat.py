@@ -22,12 +22,16 @@ class UAnswer(QWidget, Ui_Your_Answer):
         super(UAnswer, self).__init__(parent)
         QWidget.__init__(self)
         self.setupUi(self)
+        self.setMinimumWidth(680)
+
 
 class Answer(QWidget, Ui_Answer):
     def __init__(self, parent=None):
         super(Answer, self).__init__(parent)
         QWidget.__init__(self)
         self.setupUi(self)
+        self.setMinimumWidth(680)
+
 
 class Chat(QtWidgets.QDialog, Ui_MainTry):
     def __init__(self):
@@ -67,8 +71,12 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
         u_answer = UAnswer()
         path = QtWidgets.QFileDialog.getOpenFileName()[0]
         pixmap = QPixmap(path)
-        u_answer.your_text_label.setPixmap(pixmap)
+
+        small_pixmap = pixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
+        u_answer.your_text_label.setPixmap(small_pixmap)
+
         size_img = os.path.getsize(path)
+
         if clientaa != None:
             clientaa.send("image".encode('utf-8'))
             time.sleep(0.5)
@@ -83,8 +91,10 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
         self.chatlistWidget.addItem(item)
         self.chatlistWidget.setItemWidget(item, u_answer)
         self.chatlistWidget.setMinimumWidth(u_answer.width())
+        u_answer.groupBox_3.setMaximumWidth(220)
         self.sendtext_lineEdit.setText("")
         self.chatlistWidget.setCurrentRow(self.chatlistWidget.count() - 1)
+
 
     def recMassage(self, text):
         answer = Answer()
@@ -99,12 +109,15 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
     def recImage(self):
         answer = Answer()
         pixmap = QPixmap(f'Image{NumberImage}.jpg')
-        answer.yourfriend_text_label.setPixmap(pixmap)
-        self.test = QLabel()
-        self.test.setPixmap(pixmap)
-        self.test.resize(pixmap.width(), pixmap.height())
-        self.test.move(625, 625)
-        self.test.show()
+
+        small_pixmap = pixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
+        answer.yourfriend_text_label.setPixmap(small_pixmap)
+
+        # self.test = QLabel()
+        # self.test.setPixmap(pixmap)
+        # self.test.resize(pixmap.width(), pixmap.height())
+        # self.test.move(625, 625)
+        # self.test.show()
         if os.path.isfile(f'Image{NumberImage}.jpg'):
             print(12334)
         item = QListWidgetItem()
@@ -112,6 +125,7 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
         self.chatlistWidget.addItem(item)
         self.chatlistWidget.setItemWidget(item, answer)
         self.chatlistWidget.setMinimumWidth(answer.width())
+        answer.groupBox_2.setMaximumWidth(220)
         self.chatlistWidget.setCurrentRow(self.chatlistWidget.count() - 1)
         print(NumberImage)
 
@@ -130,7 +144,7 @@ class clientThread(Thread):
             print('Waiting for connection response')
 
             try:
-                clientaa.connect(("192.168.0.109", 12345))
+                clientaa.connect(("172.20.10.5", 12345))
                 while True:
                     massage = clientaa.recv(1024)
                     clearM = massage.decode("utf-8")
