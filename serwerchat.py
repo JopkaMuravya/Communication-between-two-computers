@@ -121,7 +121,7 @@ class serverThread(Thread):
             clientaa = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             host = "10.193.166.148"
             port = 12345
-            clientaa.bind(("192.168.0.109", 12345))
+            clientaa.bind(("192.168.0.109", 12346))
             print(' Socket is listening...')
             clientaa.listen(1)
             global server
