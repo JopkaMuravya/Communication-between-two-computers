@@ -104,19 +104,21 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
         self.chatlistWidget.setCurrentRow(self.chatlistWidget.count()-1)
 
     def recImage(self):
-        answer = Answer()
-        pixmap = QPixmap(f'Image{NumberImage}.jpg')
+        if os.path.isfile(f'Image{NumberImage}.jpg'):
 
-        small_pixmap = pixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
-        answer.yourfriend_text_label.setPixmap(small_pixmap)
+            answer = Answer()
+            pixmap = QPixmap(f'Image{NumberImage}.jpg')
 
-        item = QListWidgetItem()
-        item.setSizeHint(answer.sizeHint())
-        self.chatlistWidget.addItem(item)
-        self.chatlistWidget.setItemWidget(item, answer)
-        self.chatlistWidget.setMinimumWidth(answer.width())
-        answer.groupBox_2.setMaximumWidth(220)
-        self.chatlistWidget.setCurrentRow(self.chatlistWidget.count() - 1)
+            small_pixmap = pixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
+            answer.yourfriend_text_label.setPixmap(small_pixmap)
+
+            item = QListWidgetItem()
+            item.setSizeHint(answer.sizeHint())
+            self.chatlistWidget.addItem(item)
+            self.chatlistWidget.setItemWidget(item, answer)
+            self.chatlistWidget.setMinimumWidth(answer.width())
+            answer.groupBox_2.setMaximumWidth(220)
+            self.chatlistWidget.setCurrentRow(self.chatlistWidget.count() - 1)
 
 
 class serverThread(Thread):
@@ -132,7 +134,7 @@ class serverThread(Thread):
             clientaa = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             host = "172.20.10.5"
             port = 12345
-            clientaa.bind(("172.20.10.5", 12345))
+            clientaa.bind(("172.20.10.13", 1234))
             print(' Socket is listening...')
             clientaa.listen(1)
             global server

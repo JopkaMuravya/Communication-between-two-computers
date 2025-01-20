@@ -107,27 +107,28 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
         self.chatlistWidget.setCurrentRow(self.chatlistWidget.count()-1)
 
     def recImage(self):
-        answer = Answer()
-        pixmap = QPixmap(f'Image{NumberImage}.jpg')
-
-        small_pixmap = pixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
-        answer.yourfriend_text_label.setPixmap(small_pixmap)
-
-        # self.test = QLabel()
-        # self.test.setPixmap(pixmap)
-        # self.test.resize(pixmap.width(), pixmap.height())
-        # self.test.move(625, 625)
-        # self.test.show()
         if os.path.isfile(f'Image{NumberImage}.jpg'):
-            print(12334)
-        item = QListWidgetItem()
-        item.setSizeHint(answer.sizeHint())
-        self.chatlistWidget.addItem(item)
-        self.chatlistWidget.setItemWidget(item, answer)
-        self.chatlistWidget.setMinimumWidth(answer.width())
-        answer.groupBox_2.setMaximumWidth(220)
-        self.chatlistWidget.setCurrentRow(self.chatlistWidget.count() - 1)
-        print(NumberImage)
+            answer = Answer()
+            pixmap = QPixmap(f'Image{NumberImage}.jpg')
+
+            small_pixmap = pixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
+            answer.yourfriend_text_label.setPixmap(small_pixmap)
+
+            # self.test = QLabel()
+            # self.test.setPixmap(pixmap)
+            # self.test.resize(pixmap.width(), pixmap.height())
+            # self.test.move(625, 625)
+            # self.test.show()
+            if os.path.isfile(f'Image{NumberImage}.jpg'):
+                print(12334)
+            item = QListWidgetItem()
+            item.setSizeHint(answer.sizeHint())
+            self.chatlistWidget.addItem(item)
+            self.chatlistWidget.setItemWidget(item, answer)
+            self.chatlistWidget.setMinimumWidth(answer.width())
+            answer.groupBox_2.setMaximumWidth(220)
+            self.chatlistWidget.setCurrentRow(self.chatlistWidget.count() - 1)
+            print(NumberImage)
 
 class clientThread(Thread):
     def __init__(self, widow):
