@@ -11,7 +11,7 @@ from answerUI import Ui_Answer
 from threading import Thread
 import socket
 import os
-from _thread import *
+
 clientaa = None
 stop_thread = False
 NumberImage = 0
@@ -37,6 +37,17 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+
+        # Добавляем поле для ввода IP-адреса
+        self.ip_lineEdit = QtWidgets.QLineEdit(self)
+        self.ip_lineEdit.setPlaceholderText("Введите IP-адрес")
+        self.ip_lineEdit.setGeometry(10, 10, 200, 30)  # Установите нужные координаты и размер
+
+        # Добавляем кнопку для подключения
+        self.connect_pushButton = QtWidgets.QPushButton("Подключиться", self)
+        self.connect_pushButton.setGeometry(220, 10, 100, 30)  # Установите нужные координаты и размер
+        self.connect_pushButton.clicked.connect(self.connect_to_server)
+
         self.send_pushButton.clicked.connect(self.sendm)
         self.end_pushButton.clicked.connect(self.closed)
         self.reclineEdit.setHidden(True)
@@ -45,17 +56,33 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
         self.reclineEditImg.setHidden(True)
         self.reclineEditImg.textChanged.connect(self.recImage)
 
+        self.client_thread = None
+
+    def closeEvent(self, event):
+        # Вызываем метод закрытия
+        self.closed()
+        event.accept()  # Принять событие закрытия
+
+    def connect_to_server(self):
+        ip_address = self.ip_lineEdit.text()  # Получаем IP-адрес из текстового поля
+        if ip_address:
+            self.client_thread = clientThread(self, ip_address)  # Передаем IP-адрес в поток
+            self.client_thread.start()  # Запускаем поток
+        else:
+            QtWidgets.QMessageBox.warning(self, "Ошибка", "Введите IP-адрес")
 
     def closed(self):
         global stop_thread
         stop_thread = True
+        if clientaa:
+            clientaa.close()
         self.close()
 
     def sendm(self):
         global clientaa
         u_answer = UAnswer()
         u_answer.your_text_label.setText(str(self.sendtext_lineEdit.text()))
-        if clientaa != None:
+        if clientaa is not None:
             clientaa.send("massage".encode('utf-8'))
             massage = self.sendtext_lineEdit.text().encode('utf-8')
             clientaa.send(massage)
@@ -77,15 +104,14 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
 
         size_img = os.path.getsize(path)
 
-        if clientaa != None:
+        if clientaa is not None:
             clientaa.send("image".encode('utf-8'))
             time.sleep(0.5)
             clientaa.send(f"{size_img}".encode('utf-8'))
             time.sleep(0.5)
-            file = open(path, 'rb')
-            image_data = file.read(size_img)
-            clientaa.send(image_data)
-            file.close()
+            with open(path, 'rb') as file:
+                image_data = file.read(size_img)
+                clientaa.send(image_data)
         item = QListWidgetItem()
         item.setSizeHint(u_answer.sizeHint())
         self.chatlistWidget.addItem(item)
@@ -95,7 +121,6 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
         self.sendtext_lineEdit.setText("")
         self.chatlistWidget.setCurrentRow(self.chatlistWidget.count() - 1)
 
-
     def recMassage(self, text):
         answer = Answer()
         answer.yourfriend_text_label.setText(str(text))
@@ -104,7 +129,7 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
         self.chatlistWidget.addItem(item)
         self.chatlistWidget.setItemWidget(item, answer)
         self.chatlistWidget.setMinimumWidth(answer.width())
-        self.chatlistWidget.setCurrentRow(self.chatlistWidget.count()-1)
+        self.chatlistWidget.setCurrentRow(self.chatlistWidget.count() - 1)
 
     def recImage(self):
         if os.path.isfile(f'Image{NumberImage}.jpg'):
@@ -114,13 +139,6 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
             small_pixmap = pixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
             answer.yourfriend_text_label.setPixmap(small_pixmap)
 
-            # self.test = QLabel()
-            # self.test.setPixmap(pixmap)
-            # self.test.resize(pixmap.width(), pixmap.height())
-            # self.test.move(625, 625)
-            # self.test.show()
-            if os.path.isfile(f'Image{NumberImage}.jpg'):
-                print(12334)
             item = QListWidgetItem()
             item.setSizeHint(answer.sizeHint())
             self.chatlistWidget.addItem(item)
@@ -128,24 +146,23 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
             self.chatlistWidget.setMinimumWidth(answer.width())
             answer.groupBox_2.setMaximumWidth(220)
             self.chatlistWidget.setCurrentRow(self.chatlistWidget.count() - 1)
-            print(NumberImage)
 
 class clientThread(Thread):
-    def __init__(self, widow):
+    def __init__(self, window, ip_address):
         Thread.__init__(self)
-        self.window = widow
+        self.window = window
+        self.ip_address = ip_address
 
     def run(self):
         global NumberImage
         global clientaa, stop_thread
         while not stop_thread:
-            if stop_thread == True: break
             clientaa = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
             print('Waiting for connection response')
 
             try:
-                clientaa.connect(("172.20.10.5", 12345))
+                clientaa.connect((self.ip_address, 1234))
                 while True:
                     massage = clientaa.recv(1024)
                     clearM = massage.decode("utf-8")
@@ -158,20 +175,18 @@ class clientThread(Thread):
                         massage = clientaa.recv(1024)
                         clearM = massage.decode("utf-8")
                         size_img = int(clearM)
-                        file = open(f'Image{NumberImage}.jpg', "wb")
-                        image_chunk = clientaa.recv(size_img)
-                        file.write(image_chunk)
-                        file.close()
+                        with open(f'Image{NumberImage}.jpg', "wb") as file:
+                            image_chunk = clientaa.recv(size_img)
+                            file.write(image_chunk)
                         self.window.reclineEditImg.setText(str(NumberImage))
             except socket.error as e:
                 print(str(e))
-
+            finally:
+                if clientaa:
+                    clientaa.close()  # Закрываем сокет при завершении работы
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     main_window = Chat()
-    client = clientThread(main_window)
-    stop_thread = False
-    client.start()
-    main_window.show()
+    main_window.show()  # Сначала показываем главное окно
     sys.exit(app.exec_())

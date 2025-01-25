@@ -12,6 +12,7 @@ from threading import Thread
 import socket
 import os
 from _thread import *
+clientaa = None
 server = None
 stop_thread = False
 NumberImage = 0
@@ -43,9 +44,16 @@ class Chat(QtWidgets.QDialog, Ui_MainTry):
         self.reclineEditImg.setHidden(True)
         self.reclineEditImg.textChanged.connect(self.recImage)
 
+    def closeEvent(self, event):
+        # Вызываем метод закрытия
+        self.closed()
+        event.accept()  # Принять событие закрытия
+
     def closed(self):
         global stop_thread
         stop_thread = True
+        if clientaa:
+            clientaa.close()
         self.close()
 
     def sendm(self):
@@ -129,34 +137,36 @@ class serverThread(Thread):
     def run(self):
         global NumberImage
         global stop_thread
+        global clientaa
         while not stop_thread:
             if stop_thread == True: break
             clientaa = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            host = "172.20.10.5"
-            port = 12345
-            clientaa.bind(("172.20.10.13", 1234))
+            clientaa.bind(("0.0.0.0", 1234))
             print(' Socket is listening...')
             clientaa.listen(1)
             global server
             (server, (ip, pot)) = clientaa.accept()
             print('Connected to: ' + str(ip) + ':' + str(pot))
-            while True:
-                massage = server.recv(1024)
-                clearM = massage.decode("utf-8")
-                if clearM == "massage":
+            try:
+                while True:
                     massage = server.recv(1024)
                     clearM = massage.decode("utf-8")
-                    self.window.reclineEdit.setText(str(clearM))
-                elif clearM == "image":
-                    NumberImage += 1
-                    massage = server.recv(1024)
-                    clearM = massage.decode("utf-8")
-                    size_img = int(clearM)
-                    file = open(f'Image{NumberImage}.jpg', "wb")
-                    image_chunk = server.recv(size_img)
-                    file.write(image_chunk)
-                    file.close()
-                    self.window.reclineEditImg.setText(str(NumberImage))
+                    if clearM == "massage":
+                        massage = server.recv(1024)
+                        clearM = massage.decode("utf-8")
+                        self.window.reclineEdit.setText(str(clearM))
+                    elif clearM == "image":
+                        NumberImage += 1
+                        massage = server.recv(1024)
+                        clearM = massage.decode("utf-8")
+                        size_img = int(clearM)
+                        file = open(f'Image{NumberImage}.jpg', "wb")
+                        image_chunk = server.recv(size_img)
+                        file.write(image_chunk)
+                        file.close()
+                        self.window.reclineEditImg.setText(str(NumberImage))
+            except socket.error as e:
+                print(str(e))
 
 
 
